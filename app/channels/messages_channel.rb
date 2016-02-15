@@ -9,11 +9,12 @@ class MessagesChannel < ApplicationCable::Channel
   end
 
   def speak(data)
-    puts "\nmy data: #{data}"
-    msg = Message.new(data["message"])
+    msg = current_user.messages.build(data["message"])
     # TODO: get current_user
-    msg.user = User.first
-    msg.save
-    ActionCable.server.broadcast 'messages_channel', message: {content: msg.content}
+    # msg.user = current_user
+    if msg.save
+      serialized = ActiveModel::SerializableResource.new(msg).as_json
+      ActionCable.server.broadcast 'messages_channel', serialized
+    end
   end
 end

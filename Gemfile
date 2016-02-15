@@ -10,19 +10,24 @@ gem 'rails', '>= 5.0.0.beta1', '< 5.1'
 gem 'puma'
 
 # Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1.7'
 
+gem 'knock'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 gem 'rack-cors'
 
+gem 'active_model_serializers', git: 'git@github.com:rails-api/active_model_serializers.git'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   # Use sqlite3 as the database for Active Record
   gem 'sqlite3'
+
+  gem 'forgery'
 end
 
 group :development do

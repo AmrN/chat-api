@@ -1,13 +1,16 @@
 Rails.application.routes.draw do
-  resources :messages
-  resources :users
+
   scope '/api' do
-          # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+    resources :messages
+    get '/users/current' => 'users#current', as: 'current_user'
+    resources :users
 
-    # Serve websocket cable requests in-process
-
+    mount Knock::Engine => "/auth"
   end
+
   mount ActionCable.server => '/cable'
+
+  # otherwise serve angular app
   get '*path' => 'angular_app#index'
 
 end

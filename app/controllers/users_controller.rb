@@ -1,4 +1,8 @@
 class UsersController < ApplicationController
+  # see http://api.rubyonrails.org/classes/ActionController/ParamsWrapper.html
+  wrap_parameters include: User.attribute_names + [:password, :password_confirmation]
+
+  before_action :authenticate, only: [:index, :current]
   before_action :set_user, only: [:show, :update, :destroy]
 
   # GET /users
@@ -10,17 +14,22 @@ class UsersController < ApplicationController
 
   # GET /users/1
   def show
-    render json: @user
+    # if current_user == @user
+      render json: @user
+    # else
+    #   head :unauthorized
+    # end
   end
 
   # POST /users
   def create
+    # byebug
     @user = User.new(user_params)
-
     if @user.save
-      render json: @user, status: :created, location: @user
+      serializer = @user.guest? ? UserWithJwtSerializer : UserSerializer
+      render json: @user, status: :created, location: @user, serializer: serializer
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render json: {errors: @user.errors}, status: :unprocessable_entity
     end
   end
 
@@ -29,13 +38,19 @@ class UsersController < ApplicationController
     if @user.update(user_params)
       render json: @user
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render json: {errors: @user.errors}, status: :unprocessable_entity
     end
   end
 
   # DELETE /users/1
   def destroy
     @user.destroy
+    head :no_content # 204
+    # byebug
+  end
+
+  def current
+    render json: current_user
   end
 
   private
@@ -46,6 +61,6 @@ class UsersController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def user_params
-      params.require(:user).permit(:username)
+      params.require(:user).permit(:username, :password, :password_confirmation)
     end
 end
