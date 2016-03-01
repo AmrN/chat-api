@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
 
   scope '/api' do
-    resources :messages
+    resources :chatrooms do
+      resources :messages
+    end
+
     get '/users/current' => 'users#current', as: 'current_user'
     resources :users
 

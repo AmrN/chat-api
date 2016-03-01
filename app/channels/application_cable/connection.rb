@@ -8,7 +8,7 @@ module ApplicationCable
     end
 
     def disconnect
-      # puts "\n\n in disconnect callback >>>>>>>>>>>>>>"
+      puts "\n\n in disconnect callback >>>>>>>>>>>>>>"
     end
 
     protected

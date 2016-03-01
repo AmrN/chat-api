@@ -1,11 +1,16 @@
 class MessagesController < ApplicationController
+  before_action :authenticate
+  before_action :set_chatroom
   before_action :set_message, only: [:show, :update, :destroy]
 
   # GET /messages
   def index
-    @messages = Message.all
+    @messages = @chatroom.messages.includes(:user)
+    if params[:before_id]
+      @messages = @messages.where('id < ?', params[:before_id])
+    end
 
-    render json: @messages
+    render json: @messages.last(10)
   end
 
   # GET /messages/1
@@ -15,10 +20,10 @@ class MessagesController < ApplicationController
 
   # POST /messages
   def create
-    @message = Message.new(message_params)
-
+    @message = @chatroom.messages.new(message_params)
+    @message.user = current_user
     if @message.save
-      render json: @message, status: :created, location: @message
+      render json: @message, status: :created, location: [@chatroom, @message]
     else
       render json: @message.errors, status: :unprocessable_entity
     end
@@ -39,13 +44,16 @@ class MessagesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
+    def set_chatroom
+      @chatroom = Chatroom.find(params[:chatroom_id])
+    end
+
     def set_message
-      @message = Message.find(params[:id])
+      @message = @chatroom.messages.find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.
     def message_params
-      params.require(:message).permit(:content, :user_id)
+      params.require(:message).permit(:content)
     end
 end
