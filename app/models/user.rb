@@ -1,6 +1,9 @@
 class User < ApplicationRecord
   has_secure_password(validations: false)
   has_many :messages, dependent: :destroy
+  has_and_belongs_to_many :subscriptions,
+    join_table: "chatroom_subscriptions",
+    class_name: "Chatroom"
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true, on: :create, unless: :guest?
   validates :password, confirmation: true, unless: :guest?

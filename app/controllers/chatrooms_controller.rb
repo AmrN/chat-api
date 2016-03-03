@@ -1,5 +1,6 @@
 class ChatroomsController < ApplicationController
-  before_action :set_chatroom, only: [:show, :update, :destroy]
+  before_action :set_chatroom, only: [:show, :update, :destroy, :subscribe]
+  before_action :authenticate
 
   # GET /chatrooms
   def index
@@ -39,6 +40,7 @@ class ChatroomsController < ApplicationController
   # DELETE /chatrooms/1
   def destroy
     @chatroom.destroy
+    head :ok
   end
 
   private
