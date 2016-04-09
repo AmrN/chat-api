@@ -5,9 +5,9 @@ class ChatroomsController < ApplicationController
   # GET /chatrooms
   def index
     if params[:search]
-      @chatrooms = Chatroom.where("name LIKE ?", "%#{params[:search]}%")
+      @chatrooms = Chatroom.includes(:subscribers).where("room_type = 'public' AND name LIKE ?", "%#{params[:search]}%")
     else
-      @chatrooms = Chatroom.all
+      @chatrooms = Chatroom.includes(:subscribers).where(room_type: 'public').all
     end
     render json: @chatrooms
   end

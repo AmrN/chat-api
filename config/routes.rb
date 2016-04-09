@@ -13,7 +13,12 @@ Rails.application.routes.draw do
 
     get '/users/current' => 'users#current', as: 'current_user'
     resources :users do
-      # get 'subscriptions'
+      resource :friendships, only: [:create, :destroy]
+
+      member do
+        get "acquaintanceship"
+        get "friends"
+      end
     end
 
     mount Knock::Engine => "/auth"

@@ -8,4 +8,11 @@ class UserSerializer < ActiveModel::Serializer
   # class MessageSerializer < ActiveModel::Serializer
   #   attributes :content
   # end
+
+  def attributes(requested_attrs = {})
+    super.tap do |attrs|
+      attrs.except!(*instance_options[:except])
+    end
+  end
+
 end

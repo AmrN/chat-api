@@ -4,6 +4,14 @@ class User < ApplicationRecord
   has_and_belongs_to_many :subscriptions,
     join_table: "chatroom_subscriptions",
     class_name: "Chatroom"
+
+  has_many :acquaintanceships, foreign_key: "person_id", dependent: :destroy
+  has_many :acquaintances, through: :acquaintanceships
+
+  has_many :friendships, -> {where(friend: true)}, class_name: "Acquaintanceship", foreign_key: "person_id"
+  has_many :friends, through: :friendships, source: "acquaintance"
+
+
   validates :username, presence: true, uniqueness: true
   validates :password, presence: true, on: :create, unless: :guest?
   validates :password, confirmation: true, unless: :guest?
@@ -19,6 +27,21 @@ class User < ApplicationRecord
 
   def self.available_username(username)
     !User.exists?(username: username)
+  end
+
+  def add_acquaintance(user, friend=false)
+    acq1 = self.acquaintanceships.new(acquaintance: user, friend: friend)
+    acq2 = user.acquaintanceships.new(acquaintance: self)
+    Acquaintanceship.transaction do
+      acq1.save
+      acq2.save
+    end
+    acq1
+  end
+
+  def add_or_get_acquaintance(user)
+    acquaintanceship = self.acquaintanceships.find_by(acquaintance_id: user.id)
+    acquaintanceship || self.add_acquaintance(user)
   end
 
   # def self.create_guest(username)

@@ -11,7 +11,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160301060414) do
+ActiveRecord::Schema.define(version: 20160306124547) do
+
+  create_table "acquaintanceships", force: :cascade do |t|
+    t.integer  "person_id"
+    t.integer  "acquaintance_id"
+    t.integer  "chatroom_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.boolean  "friend"
+    t.index ["acquaintance_id"], name: "index_acquaintanceships_on_acquaintance_id"
+    t.index ["chatroom_id"], name: "index_acquaintanceships_on_chatroom_id"
+    t.index ["person_id", "acquaintance_id"], name: "index_acquaintanceships_on_person_id_and_acquaintance_id", unique: true
+    t.index ["person_id"], name: "index_acquaintanceships_on_person_id"
+  end
 
   create_table "chatroom_subscriptions", force: :cascade do |t|
     t.integer "user_id"
@@ -26,6 +39,8 @@ ActiveRecord::Schema.define(version: 20160301060414) do
     t.text     "description"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.string   "room_type"
+    t.boolean  "one_to_one"
   end
 
   create_table "messages", force: :cascade do |t|

@@ -3,19 +3,19 @@ class UsersController < ApplicationController
   wrap_parameters include: User.attribute_names + [:password, :password_confirmation]
 
   before_action :authenticate, only: [:index, :current]
-  before_action :set_user, only: [:show, :update, :destroy]
+  before_action :set_user, only: [:show, :update, :destroy, :acquaintanceship, :friends]
 
   # GET /users
   def index
     @users = User.all
-
+    byebug
     render json: @users
   end
 
   # GET /users/1
   def show
     # if current_user == @user
-      render json: @user
+      render json: @user, serializer: UserWithAcquaintanceshipSerializer
     # else
     #   head :unauthorized
     # end
@@ -51,6 +51,20 @@ class UsersController < ApplicationController
 
   def current
     render json: current_user
+  end
+
+  def friends
+    friends = @user.friends.all
+    render json: friends, serializer: ActiveModel::Serializer::ArraySerializer, each_serializer: UserWithAcquaintanceshipSerializer
+  end
+
+  def acquaintanceship
+    if current_user == @user
+      @acquaintanceship = nil
+    else
+      @acquaintanceship = current_user.add_or_get_acquaintance(@user)
+    end
+    render json: @acquaintanceship
   end
 
   private
